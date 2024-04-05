@@ -14,21 +14,21 @@ export class JobHistory {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
-  start_date: Date;
-
-  @Column()
-  end_date: Date;
-
   @ManyToOne(() => Employee, (employee) => employee.jobHistories)
   @JoinColumn({ name: 'employee_id' })
   employee: Employee;
 
-  @ManyToOne(() => Job, (job) => job)
+  @Column({ name: 'start_date' })
+  startDate: Date;
+
+  @Column({ name: 'end_date' })
+  endDate: Date;
+
+  @ManyToOne(() => Job)
   @JoinColumn({ name: 'job_id' })
   job: Job;
 
-  @ManyToOne(() => Department, (department) => department)
+  @ManyToOne(() => Department)
   @JoinColumn({ name: 'department_id' })
   department: Department;
 }

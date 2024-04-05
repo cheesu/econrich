@@ -20,8 +20,12 @@ export class EmployeesService {
     return `This action returns all employees`;
   }
 
+  //Employee의 현재 상태를 반환하는 findOne 메서드를 구현합니다. 찾는 기준은 employee_id입니다.
   async findOne(id: number): Promise<Employee | null> {
-    return await this.employeesRepository.findOneBy({ employee_id: id });
+    return await this.employeesRepository.findOne({
+      where: { employeeId: id },
+      relations: ['job', 'department', 'manager'],
+    });
   }
 
   update(id: number, updateEmployeeDto: UpdateEmployeeDto) {

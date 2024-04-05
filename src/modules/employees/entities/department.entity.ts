@@ -11,11 +11,11 @@ import { Employee } from './employee.entity';
 
 @Entity('departments')
 export class Department {
-  @PrimaryGeneratedColumn()
-  department_id: number;
+  @PrimaryGeneratedColumn({ name: 'department_id' })
+  departmentId: number;
 
-  @Column({ length: 30 })
-  department_name: string;
+  @Column({ name: 'department_name', length: 30 })
+  departmentName: string;
 
   @ManyToOne(() => Location, (location) => location.departments)
   @JoinColumn({ name: 'location_id' })
@@ -23,6 +23,9 @@ export class Department {
 
   @OneToMany(() => Employee, (employee) => employee.department)
   employees: Employee[];
+
+  @Column({ name: 'manager_id', nullable: true })
+  managerId: number;
 
   @ManyToOne(() => Employee, (employee) => employee.managedDepartments)
   @JoinColumn({ name: 'manager_id' })

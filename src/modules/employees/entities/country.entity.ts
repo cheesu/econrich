@@ -11,11 +11,11 @@ import { Location } from './location.entity';
 
 @Entity('countries')
 export class Country {
-  @PrimaryColumn({ length: 2 })
-  country_id: string;
+  @PrimaryColumn({ name: 'country_id', length: 2 })
+  countryId: string;
 
-  @Column({ length: 40 })
-  country_name: string;
+  @Column({ name: 'country_name', length: 40 })
+  countryName: string;
 
   @ManyToOne(() => Region, (region) => region.countries)
   @JoinColumn({ name: 'region_id' })

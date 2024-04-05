@@ -15,6 +15,11 @@ import { UpdateEmployeeDto } from './dto/update-employee.dto';
 export class EmployeesController {
   constructor(private readonly employeesService: EmployeesService) {}
 
+  @Get(':id')
+  findOne(@Param('id') id: number) {
+    return this.employeesService.findOne(+id);
+  }
+
   @Post()
   create(@Body() createEmployeeDto: CreateEmployeeDto) {
     return this.employeesService.create(createEmployeeDto);
@@ -23,11 +28,6 @@ export class EmployeesController {
   @Get()
   findAll() {
     return this.employeesService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: number) {
-    return this.employeesService.findOne(+id);
   }
 
   @Patch(':id')

@@ -3,11 +3,11 @@ import { Country } from './country.entity';
 
 @Entity('regions')
 export class Region {
-  @PrimaryGeneratedColumn()
-  region_id: number;
+  @PrimaryGeneratedColumn({ name: 'region_id' })
+  regionId: number;
 
-  @Column({ length: 25 })
-  region_name: string;
+  @Column({ name: 'region_name', length: 25 })
+  regionName: string;
 
   @OneToMany(() => Country, (country) => country.region)
   countries: Country[];

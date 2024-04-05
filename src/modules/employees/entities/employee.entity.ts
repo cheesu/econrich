@@ -12,29 +12,35 @@ import { JobHistory } from './jobHistory.entity';
 
 @Entity('employees')
 export class Employee {
-  @PrimaryGeneratedColumn()
-  employee_id: number;
+  @PrimaryGeneratedColumn({ name: 'employee_id' })
+  employeeId: number;
 
-  @Column({ length: 20 })
-  first_name: string;
+  @Column({ name: 'first_name', length: 20 })
+  firstName: string;
 
-  @Column({ length: 25 })
-  last_name: string;
+  @Column({ name: 'last_name', length: 25 })
+  lastName: string;
 
-  @Column({ length: 25 })
+  @Column({ name: 'email', length: 25 })
   email: string;
 
-  @Column({ length: 20 })
-  phone_number: string;
+  @Column({ name: 'phone_number', length: 20, nullable: true })
+  phoneNumber: string;
 
-  @Column()
-  hire_date: Date;
+  @Column({ name: 'hire_date' })
+  hireDate: Date;
 
-  @Column('decimal', { precision: 8, scale: 2 })
+  @Column({ name: 'salary', type: 'decimal', precision: 8, scale: 2 })
   salary: number;
 
-  @Column('decimal', { precision: 2, scale: 2, nullable: true })
-  commission_pct: number;
+  @Column({
+    name: 'commission_pct',
+    type: 'decimal',
+    precision: 2,
+    scale: 2,
+    nullable: true,
+  })
+  commissionPct: number;
 
   @ManyToOne(() => Job, (job) => job.employees)
   @JoinColumn({ name: 'job_id' })
@@ -50,7 +56,7 @@ export class Employee {
   @JoinColumn({ name: 'manager_id' })
   manager: Employee;
 
-  @OneToMany(() => Employee, (employee) => employee.manager)
+  @OneToMany(() => Employee, (directReport) => directReport.manager)
   directReports: Employee[];
 
   @OneToMany(() => Department, (department) => department.manager)

@@ -21,7 +21,7 @@ import { EmployeesModule } from './modules/employees/employees.module';
         password: configService.get('DATABASE_PASSWORD'),
         database: configService.get('DATABASE_NAME'),
         entities: [__dirname + '/**/*.entity{.ts,.js}'],
-        synchronize: true, // 주의: 프로덕션 환경에서는 false로 설정해야 합니다.
+        synchronize: false, // 주의: 프로덕션 환경에서는 false로 설정해야 합니다.
       }),
       inject: [ConfigService], // ConfigService를 주입
     }),

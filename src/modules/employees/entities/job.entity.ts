@@ -1,5 +1,6 @@
 import { Entity, PrimaryColumn, Column, OneToMany } from 'typeorm';
 import { Employee } from './employee.entity';
+import { JobHistory } from './jobHistory.entity';
 
 @Entity('jobs')
 export class Job {
@@ -29,4 +30,7 @@ export class Job {
 
   @OneToMany(() => Employee, (employee) => employee.job)
   employees: Employee[];
+
+  @OneToMany(() => JobHistory, (jobHistory) => jobHistory.job)
+  jobHistory: JobHistory[];
 }

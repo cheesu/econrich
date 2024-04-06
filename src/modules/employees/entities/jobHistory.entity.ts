@@ -1,24 +1,14 @@
-import {
-  Entity,
-  PrimaryGeneratedColumn,
-  Column,
-  ManyToOne,
-  JoinColumn,
-} from 'typeorm';
+import { Entity, PrimaryColumn, Column, ManyToOne, JoinColumn } from 'typeorm';
 import { Employee } from './employee.entity';
 import { Job } from './job.entity';
-import { Department } from './department.entity';
+import { Department } from '../../departments/entities/department.entity';
 
 @Entity('job_history')
 export class JobHistory {
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryColumn({ name: 'employee_id' })
+  employeeId: number;
 
-  @ManyToOne(() => Employee, (employee) => employee.jobHistories)
-  @JoinColumn({ name: 'employee_id' })
-  employee: Employee;
-
-  @Column({ name: 'start_date' })
+  @PrimaryColumn({ name: 'start_date' })
   startDate: Date;
 
   @Column({ name: 'end_date' })
@@ -27,6 +17,10 @@ export class JobHistory {
   @ManyToOne(() => Job)
   @JoinColumn({ name: 'job_id' })
   job: Job;
+
+  @ManyToOne(() => Employee, (employee) => employee.jobHistories)
+  @JoinColumn({ name: 'employee_id' })
+  employee: Employee;
 
   @ManyToOne(() => Department)
   @JoinColumn({ name: 'department_id' })

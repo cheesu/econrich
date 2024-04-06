@@ -18,9 +18,6 @@ class DepartmentDto {
 
 export class GetHistoryDto {
   @Expose()
-  id: number;
-
-  @Expose()
   employeeId: number;
 
   @Expose()

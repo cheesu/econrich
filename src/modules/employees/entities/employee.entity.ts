@@ -6,7 +6,7 @@ import {
   JoinColumn,
   OneToMany,
 } from 'typeorm';
-import { Department } from './department.entity';
+import { Department } from '../../departments/entities/department.entity';
 import { Job } from './job.entity';
 import { JobHistory } from './jobHistory.entity';
 

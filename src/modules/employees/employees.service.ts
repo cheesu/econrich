@@ -2,8 +2,8 @@ import { Injectable } from '@nestjs/common';
 import { plainToClass, plainToInstance } from 'class-transformer';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { Employee } from './entities/employee.entity'; // 엔티티의 정확한 경로를 확인하세요.
-import { JobHistory } from './entities/jobHistory.entity'; // 엔티티의 정확한 경로를 확인하세요.
+import { Employee } from './entities/employee.entity';
+import { JobHistory } from './entities/jobHistory.entity';
 import { GetEmployeeDto } from './dto/get-employee.dto';
 import { GetHistoryDto } from './dto/get-history.dto';
 

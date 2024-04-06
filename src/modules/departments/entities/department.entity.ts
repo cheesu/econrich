@@ -7,7 +7,7 @@ import {
   OneToMany,
 } from 'typeorm';
 import { Location } from './location.entity';
-import { Employee } from './employee.entity';
+import { Employee } from '../../employees/entities/employee.entity';
 
 @Entity('departments')
 export class Department {

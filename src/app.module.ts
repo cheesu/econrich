@@ -4,6 +4,7 @@ import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EmployeesModule } from './modules/employees/employees.module';
+import { DepartmentsModule } from './modules/departments/departments.module';
 
 @Module({
   imports: [
@@ -26,6 +27,7 @@ import { EmployeesModule } from './modules/employees/employees.module';
       inject: [ConfigService], // ConfigService를 주입
     }),
     EmployeesModule,
+    DepartmentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

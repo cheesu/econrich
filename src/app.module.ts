@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { EmployeesModule } from './modules/employees/employees.module';
 import { DepartmentsModule } from './modules/departments/departments.module';
+import { ReservoirModule } from './modules/reservoir/reservoir.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { DepartmentsModule } from './modules/departments/departments.module';
     }),
     EmployeesModule,
     DepartmentsModule,
+    ReservoirModule,
   ],
   controllers: [AppController],
   providers: [AppService],

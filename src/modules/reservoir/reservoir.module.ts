@@ -5,11 +5,9 @@ import { ReservoirController } from './reservoir.controller';
 
 @Module({
   imports: [
-    HttpModule.registerAsync({
-      useFactory: () => ({
-        timeout: 10000,
-        maxRedirects: 10,
-      }),
+    HttpModule.register({
+      timeout: 5000,
+      maxRedirects: 5,
     }),
   ],
   controllers: [ReservoirController],

@@ -1,4 +1,9 @@
-import { Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { plainToClass, plainToInstance } from 'class-transformer';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -19,35 +24,48 @@ export class EmployeesService {
 
   //Employee의 현재 상태를 반환하는 findOne 메서드를 구현합니다. 찾는 기준은 employee_id입니다.
   async findOne(id: number): Promise<GetEmployeeDto | null> {
-    const employee = await this.employeesRepository.findOne({
-      where: { employeeId: id },
-      relations: ['job', 'department', 'manager'],
-    });
+    try {
+      const employee = await this.employeesRepository.findOne({
+        where: { employeeId: id },
+        relations: ['job', 'department', 'manager'],
+      });
 
-    if (!employee) return null;
+      if (!employee)
+        throw new NotFoundException(`Employee with ID ${id} not found`);
 
-    // Job, Department, Manager 정보가 포함된 EmployeeDto를 자동으로 생성
-    const employeeDto = plainToClass(GetEmployeeDto, employee, {
-      excludeExtraneousValues: true, // 이 옵션은 DTO에서 정의하지 않은 엔티티의 속성을 제외
-    });
+      const employeeDto = plainToClass(GetEmployeeDto, employee, {
+        excludeExtraneousValues: true,
+      });
 
-    return employeeDto;
+      return employeeDto;
+    } catch (error) {
+      // 에러가 TypeORM 또는 다른 내부 라이브러리에서 발생한 경우, InternalServerErrorException으로 처리
+      throw new InternalServerErrorException('Internal Server Error');
+    }
   }
 
   async findOneHistory(id: number): Promise<GetHistoryDto[]> {
-    // Employee의 jobHistory를 반환하는 findOneHistory 메서드를 구현합니다. 찾는 기준은 employee_id입니다.
-    const jobHistoryList = await this.jobHistoryRepository.find({
-      where: { employee: { employeeId: id } },
-      relations: ['job', 'department'],
-    });
+    try {
+      // Employee의 jobHistory를 반환하는 findOneHistory 메서드를 구현합니다. 찾는 기준은 employee_id입니다.
+      const jobHistoryList = await this.jobHistoryRepository.find({
+        where: { employee: { employeeId: id } },
+        relations: ['job', 'department'],
+      });
 
-    if (!jobHistoryList) return null;
+      if (!jobHistoryList.length)
+        throw new NotFoundException(
+          `Job history for Employee ID ${id} not found`,
+        );
 
-    // Job, Department 정보가 포함된 JobHistoryDto를 자동으로 생성
-    const jobHistoryDtoList = plainToInstance(GetHistoryDto, jobHistoryList, {
-      excludeExtraneousValues: true, // 이 옵션은 DTO에서 정의하지 않은 엔티티의 속성을 제외
-    });
+      // Job, Department 정보가 포함된 JobHistoryDto를 자동으로 생성
+      const jobHistoryDtoList = plainToInstance(GetHistoryDto, jobHistoryList, {
+        excludeExtraneousValues: true,
+      });
 
-    return jobHistoryDtoList;
+      return jobHistoryDtoList;
+    } catch (error) {
+      // 에러가 TypeORM 또는 다른 내부 라이브러리에서 발생한 경우, InternalServerErrorException으로 처리
+      throw new InternalServerErrorException('Internal Server Error');
+    }
   }
 }

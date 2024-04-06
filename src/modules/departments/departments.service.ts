@@ -1,10 +1,15 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Department } from './entities/department.entity';
 import { plainToInstance } from 'class-transformer';
 import { GetDepartmentDto } from './dto/get-department.dto';
 import { Employee } from '../employees/entities/employee.entity';
+import { ResIncreaseSalaryDto } from './dto/res-increaseSalary.dto';
 
 @Injectable()
 export class DepartmentsService {
@@ -16,54 +21,74 @@ export class DepartmentsService {
     private employeesRepository: Repository<Employee>, // Repository 주입
   ) {}
   async findAll(): Promise<GetDepartmentDto[] | null> {
-    // Employee의 부서 정보를 반환하는 findOneDepartment 메서드를 구현합니다. 찾는 기준은 employee_id입니다.
-    const departmentList = await this.departmentRepository.find({
-      relations: [
-        'manager',
-        'location',
-        'location.country',
-        'location.country.region',
-      ],
-    });
+    try {
+      const departmentList = await this.departmentRepository.find({
+        relations: [
+          'manager',
+          'location',
+          'location.country',
+          'location.country.region',
+        ],
+      });
 
-    if (!departmentList) return null;
+      const departmentDtoList = plainToInstance(
+        GetDepartmentDto,
+        departmentList,
+        {
+          excludeExtraneousValues: true,
+        },
+      );
 
-    const departmentDtoList = plainToInstance(
-      GetDepartmentDto,
-      departmentList,
-      {
-        excludeExtraneousValues: true, // 이 옵션은 DTO에서 정의하지 않은 엔티티의 속성을 제외
-      },
-    );
-
-    return departmentDtoList;
+      return departmentDtoList;
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'An error occurred while retrieving departments.',
+      );
+    }
   }
 
   async increaseSalary(
     departmentId: number,
     rate: number,
-  ): Promise<{ updatedCount: number }> {
-    // 먼저 해당 부서 ID가 존재하는지 확인
-    const departmentExists = await this.departmentRepository.findOneBy({
-      departmentId: departmentId,
-    });
+  ): Promise<ResIncreaseSalaryDto> {
+    let departmentExists;
+    try {
+      departmentExists = await this.departmentRepository.findOneBy({
+        departmentId,
+      });
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'An error occurred while checking the department existence.',
+      );
+    }
+
     if (!departmentExists) {
       throw new BadRequestException(
         `Department with ID ${departmentId} does not exist.`,
       );
     }
 
-    // 업데이트 실행
-    const result = await this.employeesRepository
-      .createQueryBuilder()
-      .update(Employee)
-      .set({
-        salary: () => `salary * ${1 + rate / 100}`,
-      })
-      .where('department_id = :departmentId', { departmentId })
-      .execute();
+    let result;
+    try {
+      result = await this.employeesRepository
+        .createQueryBuilder()
+        .update(Employee)
+        .set({
+          salary: () => `salary * ${1 + rate / 100}`,
+        })
+        .where('department_id = :departmentId', { departmentId })
+        .execute();
+    } catch (error) {
+      throw new InternalServerErrorException(
+        'An error occurred while updating employee salaries.',
+      );
+    }
 
-    // 업데이트된 레코드의 수를 반환
-    return { updatedCount: result.affected };
+    // 업데이트된 레코드의 수를 ResIncreaseSalaryDto로 변환
+    const responseDto = plainToInstance(ResIncreaseSalaryDto, {
+      updatedCount: result.affected,
+    });
+
+    return responseDto;
   }
 }

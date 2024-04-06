@@ -54,10 +54,9 @@ export class ReservoirService {
       const serviceKey = this.configService.get<string>(
         'RES_WATER_LEVEL_DEC_API_KEY',
       );
-      const encodedApiKey = encodeURIComponent(serviceKey); // API 키 인코딩
 
       const queryParams = {
-        serviceKey: encodedApiKey,
+        serviceKey: serviceKey,
         numOfRows: 10,
         pageNo: Number(dto.pageNo),
         fac_name: dto.facName ?? null,
@@ -114,10 +113,9 @@ export class ReservoirService {
       const serviceKey = this.configService.get<string>(
         'RES_WATER_LEVEL_DEC_API_KEY',
       );
-      const encodedApiKey = encodeURIComponent(serviceKey); // API 키 인코딩
 
       const queryParams = {
-        serviceKey: encodedApiKey,
+        serviceKey: serviceKey,
         numOfRows: 10,
         pageNo: Number(dto.pageNo),
         fac_code: dto.facCode,

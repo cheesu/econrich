@@ -63,24 +63,28 @@ export class ReservoirController {
     required: true,
     description: '저수지 코드',
     type: String,
+    example: '4481010021',
   })
   @ApiQuery({
     name: 'dateS',
     required: true,
     description: '조회 시작 날짜 (YYYYMMDD)',
     type: String,
+    example: '20240101',
   })
   @ApiQuery({
     name: 'dateE',
     required: true,
     description: '조회 종료 날짜 (YYYYMMDD)',
     type: String,
+    example: '20240131',
   })
   @ApiQuery({
     name: 'pageNo',
     required: true,
     description: '페이지 번호',
     type: Number,
+    example: 1,
   })
   @ApiCommonReservoirResponses()
   async getWaterLevelList(@Query() query: GetReservoirWaterLevelDto) {

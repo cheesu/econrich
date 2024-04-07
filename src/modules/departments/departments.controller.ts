@@ -52,6 +52,7 @@ export class DepartmentController {
     required: true,
     description: '부서 ID',
     type: Number,
+    example: 50,
   })
   @ApiBody({
     description: '인상할 급여 비율',

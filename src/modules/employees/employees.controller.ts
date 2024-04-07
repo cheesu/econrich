@@ -24,6 +24,7 @@ export class EmployeesController {
     required: true,
     description: '사원 ID',
     type: Number,
+    example: 101,
   })
   @ApiResponse({
     status: 404,
@@ -54,6 +55,7 @@ export class EmployeesController {
     required: true,
     description: '사원 ID',
     type: Number,
+    example: 101,
   })
   @ApiResponse({
     status: 404,

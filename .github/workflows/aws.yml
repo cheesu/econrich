@@ -59,6 +59,7 @@ jobs:
           echo "DATABASE_PORT =$DATABASE_PORT" >> .env
           echo "DATABASE_USERNAME=$DATABASE_USERNAME" >> .env
           echo "DATABASE_PASSWORD=$DATABASE_PASSWORD" >> .env
+          echo "DATABASE_NAME=$DATABASE_NAME" >> .env
           echo "RES_WATER_LEVEL_DEC_API_KEY=$RES_WATER_LEVEL_DEC_API_KEY" >> .env
 
         env:
@@ -66,6 +67,7 @@ jobs:
           DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
           DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
           DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          DATABASE_NAME: ${{ secrets.DATABASE_NAME }}
           RES_WATER_LEVEL_DEC_API_KEY: ${{ secrets.RES_WATER_LEVEL_DEC_API_KEY }}
 
       - name: Build Docker image

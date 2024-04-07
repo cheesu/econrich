@@ -4,13 +4,13 @@
 # To use this workflow, you will need to complete the following set-up steps:
 #
 # 1. Create an ECR repository to store your images.
-#    For example: `aws ecr create-repository --repository-name my-ecr-repo --region us-east-2`.
+#    For example: `aws ecr create-repository --repository-name my-ecr-repo --region ap-northeast-2`.
 #    Replace the value of the `ECR_REPOSITORY` environment variable in the workflow below with your repository's name.
 #    Replace the value of the `AWS_REGION` environment variable in the workflow below with your repository's region.
 #
 # 2. Create an ECS task definition, an ECS cluster, and an ECS service.
 #    For example, follow the Getting Started guide on the ECS console:
-#      https://us-east-2.console.aws.amazon.com/ecs/home?region=us-east-2#/firstRun
+#      https://ap-northeast-2.console.aws.amazon.com/ecs/home?region=ap-northeast-2#/firstRun
 #    Replace the value of the `ECS_SERVICE` environment variable in the workflow below with the name you set for the Amazon ECS service.
 #    Replace the value of the `ECS_CLUSTER` environment variable in the workflow below with the name you set for the cluster.
 #
@@ -23,72 +23,119 @@
 # 4. Store an IAM user access key in GitHub Actions secrets named `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY`.
 #    See the documentation for each action used below for the recommended IAM policies for this IAM user,
 #    and best practices on handling the access key credentials.
-
-name: Deploy to Amazon ECS
+name: Push Docker image to Amazon ECR
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main
 
 env:
-  AWS_REGION: MY_AWS_REGION                   # set this to your preferred AWS region, e.g. us-west-1
-  ECR_REPOSITORY: MY_ECR_REPOSITORY           # set this to your Amazon ECR repository name
-  ECS_SERVICE: MY_ECS_SERVICE                 # set this to your Amazon ECS service name
-  ECS_CLUSTER: MY_ECS_CLUSTER                 # set this to your Amazon ECS cluster name
-  ECS_TASK_DEFINITION: MY_ECS_TASK_DEFINITION # set this to the path to your Amazon ECS task definition
-                                               # file, e.g. .aws/task-definition.json
-  CONTAINER_NAME: MY_CONTAINER_NAME           # set this to the name of the container in the
-                                               # containerDefinitions section of your task definition
-
-permissions:
-  contents: read
+  ECR_REGISTRY: 666460501111.dkr.ecr.ap-northeast-2.amazonaws.com
+  ECR_REPOSITORY: node
+  AWS_REGION: ap-northeast-2
+  IMG_TAG: latest
 
 jobs:
-  deploy:
-    name: Deploy
+  push:
+    name: Push Docker image to ECR
     runs-on: ubuntu-latest
-    environment: production
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v2
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: ${{ env.AWS_REGION }}
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
+      # Github Repository Secrets를 통해 환경 변수 파일을 생성합니다.
+      - name: Generate Environment Variables File for Production
+        run: |
+          echo "DATABASE_HOST =$DATABASE_HOST" >> .env
+          echo "DATABASE_PORT =$DATABASE_PORT" >> .env
+          echo "DATABASE_USERNAME=$DATABASE_USERNAME" >> .env
+          echo "DATABASE_PASSWORD=$DATABASE_PASSWORD" >> .env
+          echo "RES_WATER_LEVEL_DEC_API_KEY=$RES_WATER_LEVEL_DEC_API_KEY" >> .env
 
-    - name: Build, tag, and push image to Amazon ECR
-      id: build-image
-      env:
-        ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        IMAGE_TAG: ${{ github.sha }}
-      run: |
-        # Build a docker container and
-        # push it to ECR so that it can
-        # be deployed to ECS.
-        docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
-        docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-        echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
+        env:
+          DATABASE_HOST: ${{ secrets.DATABASE_HOST }}
+          DATABASE_PORT: ${{ secrets.DATABASE_PORT }}
+          DATABASE_USERNAME: ${{ secrets.DATABASE_USERNAME }}
+          DATABASE_PASSWORD: ${{ secrets.DATABASE_PASSWORD }}
+          RES_WATER_LEVEL_DEC_API_KEY: ${{ secrets.RES_WATER_LEVEL_DEC_API_KEY }}
 
-    - name: Fill in the new image ID in the Amazon ECS task definition
-      id: task-def
-      uses: aws-actions/amazon-ecs-render-task-definition@v1
-      with:
-        task-definition: ${{ env.ECS_TASK_DEFINITION }}
-        container-name: ${{ env.CONTAINER_NAME }}
-        image: ${{ steps.build-image.outputs.image }}
+      - name: Build Docker image
+        run: |
+          docker build -t ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMG_TAG }} .
 
-    - name: Deploy Amazon ECS task definition
-      uses: aws-actions/amazon-ecs-deploy-task-definition@v1
-      with:
-        task-definition: ${{ steps.task-def.outputs.task-definition }}
-        service: ${{ env.ECS_SERVICE }}
-        cluster: ${{ env.ECS_CLUSTER }}
-        wait-for-service-stability: true
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Push Docker image to ECR
+        run: |
+          docker tag ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMG_TAG }} ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.IMG_TAG }}
+          docker push ${{ steps.login-ecr.outputs.registry }}/${{ env.ECR_REPOSITORY }}:${{ env.IMG_TAG }}
+
+  deploy:
+    needs: push
+    name: ssh
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get Github Actions IP
+        id: ip
+        uses: haythem/public-ip@v1.2
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-northeast-2
+
+      - name: Add Github Actions IP to Security group
+        run: |
+          aws ec2 authorize-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32
+
+      - name: SSH Commands
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.AWS_SSH_HOST }}
+          username: ${{ secrets.AWS_SSH_USERNAME }}
+          key: ${{ secrets.AWS_SSH_KEY }}
+          port: ${{ secrets.AWS_SSH_PORT }}
+          script_stop: true
+          script: |
+            export AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}
+            export AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}
+            export AWS_DEFAULT_REGION=${{ env.AWS_REGION }}
+
+            aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
+            docker-compose down --rmi all
+            docker pull ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMG_TAG }}
+            docker-compose up -d
+
+      - name: SSH Commands Docker Start
+        if: ${{ failure() }}
+        uses: appleboy/ssh-action@v0.1.6
+        with:
+          host: ${{ secrets.AWS_SSH_HOST }}
+          username: ${{ secrets.AWS_SSH_USERNAME }}
+          key: ${{ secrets.AWS_SSH_KEY }}
+          port: ${{ secrets.AWS_SSH_PORT }}
+          script_stop: true
+          script: |
+            aws ecr get-login-password --region ${{ env.AWS_REGION }} | docker login --username AWS --password-stdin ${{ env.ECR_REGISTRY }}
+            sudo service docker start
+            docker-compose down --rmi all
+            docker pull ${{ env.ECR_REGISTRY }}/${{ env.ECR_REPOSITORY }}:${{ env.IMG_TAG }}
+            docker-compose up -d
+
+      - name: Remove Github Actions IP From Security Group
+        if: always()
+        run: |
+          aws ec2 revoke-security-group-ingress --group-id ${{ secrets.AWS_SG_ID }} --protocol tcp --port 22 --cidr ${{ steps.ip.outputs.ipv4 }}/32

@@ -83,7 +83,7 @@ export class ReservoirService {
         result.OpenAPI_ServiceResponse?.cmmMsgHeader?.returnReasonCode === '30'
       ) {
         throw new InternalServerErrorException(
-          '일시적인 오류 입니다 다시 시도하여 주십시오.',
+          'SERVICE_KEY_IS_NOT_REGISTERED_ERROR.',
         );
       }
 
@@ -95,7 +95,7 @@ export class ReservoirService {
     } catch (error) {
       if (
         error instanceof InternalServerErrorException &&
-        error.message === '일시적인 오류 입니다 다시 시도하여 주십시오.'
+        error.message === 'SERVICE_KEY_IS_NOT_REGISTERED_ERROR.'
       ) {
         console.error('SERVICE_KEY_IS_NOT_REGISTERED_ERROR');
         throw error;
@@ -161,9 +161,7 @@ export class ReservoirService {
         throw error;
       } else {
         console.error('Error fetching reservoir water level data:', error);
-        throw new InternalServerErrorException(
-          'Error fetching reservoir water level data',
-        );
+        throw new InternalServerErrorException('Error fetching reservoir data');
       }
     }
   }

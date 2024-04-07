@@ -2,6 +2,7 @@ import {
   Injectable,
   BadRequestException,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -63,7 +64,7 @@ export class DepartmentsService {
     }
 
     if (!departmentExists) {
-      throw new BadRequestException(
+      throw new NotFoundException(
         `Department with ID ${departmentId} does not exist.`,
       );
     }

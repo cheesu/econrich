@@ -1,5 +1,4 @@
 import {
-  BadRequestException,
   Injectable,
   NotFoundException,
   InternalServerErrorException,
@@ -39,6 +38,9 @@ export class EmployeesService {
 
       return employeeDto;
     } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       // 에러가 TypeORM 또는 다른 내부 라이브러리에서 발생한 경우, InternalServerErrorException으로 처리
       throw new InternalServerErrorException('Internal Server Error');
     }
@@ -64,6 +66,9 @@ export class EmployeesService {
 
       return jobHistoryDtoList;
     } catch (error) {
+      if (error instanceof NotFoundException) {
+        throw error;
+      }
       // 에러가 TypeORM 또는 다른 내부 라이브러리에서 발생한 경우, InternalServerErrorException으로 처리
       throw new InternalServerErrorException('Internal Server Error');
     }

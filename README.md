@@ -34,8 +34,6 @@ TypeORM: TypeScript와 JavaScript 양쪽 모두에서 사용할 수 있는 ORM�
 
 MySQL/MariaDB: 관계형 데이터베이스 관리 시스템으로, 데이터 저장과 조작을 위해 사용됩니다.
 
-Passport: 사용자 인증을 위한 미들웨어로, 다양한 인증 방식을 쉽게 구현할 수 있습니다.
-
 Class-validator 및 Class-transformer: DTO(Data Transfer Object) 검증과 변환을 위한 라이브러리로, 입력 데이터의 유효성 검사 및 타입 변환을 단순화합니다.
 
 Swagger: API 문서 자동화 도구로, API의 명세와 테스트를 위한 UI를 제공합니다.

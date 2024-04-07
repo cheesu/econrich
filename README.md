@@ -24,7 +24,68 @@
 
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+NodeNest는 NestJS와 Node.js를 기반으로 한 백엔드 애플리케이션 프로젝트입니다. RESTful API 구현을 중점으로, 데이터 처리 및 외부 API 연동 기능을 제공합니다. 이 프로젝트는 NestJS의 주요 기능과 구조를 활용하여 안정적이고 확장 가능한 서버 사이드 애플리케이션을 구축하는 것을 목표로 합니다.
+
+### 기술 스택
+
+NestJS: 모듈화된 아키텍처를 제공하는 Node.js 프레임워크로, 효율적인 서버 사이드 애플리케이션 개발을 지원합니다.
+
+TypeORM: TypeScript와 JavaScript 양쪽 모두에서 사용할 수 있는 ORM으로, 데이터베이스 관리를 용이하게 합니다.
+
+MySQL/MariaDB: 관계형 데이터베이스 관리 시스템으로, 데이터 저장과 조작을 위해 사용됩니다.
+
+Passport: 사용자 인증을 위한 미들웨어로, 다양한 인증 방식을 쉽게 구현할 수 있습니다.
+
+Class-validator 및 Class-transformer: DTO(Data Transfer Object) 검증과 변환을 위한 라이브러리로, 입력 데이터의 유효성 검사 및 타입 변환을 단순화합니다.
+
+Swagger: API 문서 자동화 도구로, API의 명세와 테스트를 위한 UI를 제공합니다.
+
+### node.js
+
+이 프로젝트는 Node.js v18 에서 개발 하였습니다.
+
+### API 문서
+
+Swagger를 통해 생성된 API 문서는 실행 중인 애플리케이션의 /api 경로에서 확인할 수 있습니다.
+ex) loclhost:8081/api
+
+## 공공 데이터 포탈
+
+### 한국농어촌공사\_농촌용수 저수지 수위정보 조회
+
+이 프로젝트는 공공 데이터 포탈의 농촌용수 저수지 수위 정보 조회 API를 활용 하고 있습니다.
+
+### API 개요
+
+API명 : reserviorWaterLevel 농업용저수지 수위자료
+API 설명 : 한국농어촌공사에서 관리중인 농업용저수지의 저수지코드 를 조회할 수 있으며, 해당 저수지 코드로 저수지 수위 정보를 조회 할 수 있다.
+
+### 상세 기능 목록
+
+1. 농업용저수지 코드조회
+2. 농업용저수지 수위조회
+
+## 프로젝트 배포 자동화
+
+이 프로젝트는 GitHub Actions를 사용하여 Amazon Elastic Container Registry(ECR)에 도커 이미지를 빌드하고 푸시한 후, Amazon Elastic Container Service(ECS)에 새 작업 정의를 배포하는 자동화된 CI/CD 파이프라인을 구현합니다.
+
+### 배포 흐름
+
+1. GitHub에서 메인 브랜치로 코드가 푸시됩니다.
+2. GitHub Actions 워크플로우가 트리거됩니다.
+
+1)  소스 코드가 체크아웃됩니다.
+2)  AWS 자격 증명이 구성됩니다.
+3)  도커 이미지가 빌드되고 Amazon ECR로 푸시됩니다.
+
+3. 새 ECS 작업 정의가 생성되고 배포됩니다.
+
+### 필요 사항
+
+AWS 계정
+Amazon ECR 리포지토리
+Amazon ECS 클러스터 및 서비스
+GitHub 리포지토리
 
 ## nest CLI
 
